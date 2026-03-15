@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruthLens — Fake News Detector</title>
+  <meta name="description" content="AI-powered fake news detection. Paste text, paste a URL, or browse live news." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       AUTH SCREEN
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-icon">🔍</div>
+        <h1 class="auth-brand">TruthLens</h1>
+        <p class="auth-tagline">AI-Powered News Verification</p>
+      </div>
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab active" id="tab-login" onclick="App.switchAuthTab('login')" role="tab">Sign In</button>
+        <button class="auth-tab" id="tab-register" onclick="App.switchAuthTab('register')" role="tab">Create
+          Account</button>
+      </div>
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form" onsubmit="App.handleLogin(event)">
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input type="text" id="login-username" placeholder="Enter your username" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="Enter your password" required
+            autocomplete="current-password" />
+        </div>
+        <div id="login-error" class="form-error" role="alert" hidden></div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+      </form>
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" style="display:none" onsubmit="App.handleRegister(event)">
+        <div class="form-group">
+          <label for="reg-username">Username</label>
+          <input type="text" id="reg-username" placeholder="Choose a username" required minlength="3" />
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Email</label>
+          <input type="email" id="reg-email" placeholder="your@email.com" required />
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" placeholder="At least 6 characters" required minlength="6" />
+        </div>
+        <div id="register-error" class="form-error" role="alert" hidden></div>
+        <div id="register-success" class="form-success" role="status" hidden></div>
+        <button type="submit" class="btn btn-primary btn-full" id="register-btn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       MAIN APP
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="app-screen" class="app-screen" style="display:none">
+
+    <!-- Navbar -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+      <div class="nav-brand">
+        <span class="nav-logo">🔍</span>
+        <span class="nav-title">TruthLens</span>
+      </div>
+      <div class="nav-tabs" role="tablist">
+        <button class="nav-tab active" id="nav-analyze" onclick="App.switchTab('analyze')" role="tab">Analyze</button>
+        <button class="nav-tab" id="nav-livefeed" onclick="App.switchTab('livefeed')" role="tab">📡 Live Feed</button>
+        <button class="nav-tab" id="nav-history" onclick="App.switchTab('history')" role="tab">History</button>
+      </div>
+      <div class="nav-user">
+        <span class="user-pill" id="nav-username">—</span>
+        <button class="btn btn-ghost btn-sm" onclick="App.logout()">Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- ─── ANALYZE TAB ─────────────────────────────────────── -->
+    <main id="tab-analyze" class="tab-content container">
+      <section class="hero">
+        <h2 class="hero-title">Verify Any News</h2>
+        <p class="hero-sub">Paste article text <strong>or</strong> a news article URL — our AI detects it in seconds.
+        </p>
+      </section>
+
+      <div class="card input-card">
+        <!-- Input mode toggle -->
+        <div class="input-mode-toggle">
+          <button class="mode-btn active" id="mode-text" onclick="App.switchInputMode('text')">📝 Paste Text</button>
+          <button class="mode-btn" id="mode-url" onclick="App.switchInputMode('url')">🔗 Paste URL</button>
+        </div>
+
+        <!-- Text form -->
+        <form id="analyze-form" onsubmit="App.handlePredict(event)">
+          <div class="form-group">
+            <label for="news-input" class="input-label">News Article Text</label>
+            <textarea id="news-input" rows="6"
+              placeholder="Paste a news headline or full article here… (min 10 characters)" required minlength="10"
+              maxlength="10000"></textarea>
+            <div class="char-count"><span id="char-count">0</span> / 10000</div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg" id="analyze-btn">
+              <span class="btn-text">🔍 Verify Article</span>
+              <span class="btn-spinner" hidden></span>
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="App.clearAnalyze()">Clear</button>
+          </div>
+          <div id="analyze-error" class="form-error" role="alert" hidden></div>
+        </form>
+
+        <!-- URL form -->
+        <form id="url-form" onsubmit="App.handleUrlAnalyze(event)" style="display:none">
+          <div class="form-group">
+            <label for="url-input" class="input-label">News Article URL</label>
+            <input type="url" id="url-input" placeholder="https://www.bbc.com/news/world-..." required />
+            <p class="url-hint">Works with BBC, Reuters, Guardian, CNN, NPR and most news sites.</p>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg" id="url-btn">
+              <span class="btn-text">🔗 Analyze URL</span>
+              <span class="btn-spinner" hidden></span>
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="App.clearAnalyze()">Clear</button>
+          </div>
+          <div id="url-error" class="form-error" role="alert" hidden></div>
+        </form>
+      </div>
+
+      <!-- Result Area -->
+      <section id="result-area" aria-live="polite"></section>
+    </main>
+
+    <!-- ─── LIVE FEED TAB ────────────────────────────────────── -->
+    <main id="tab-livefeed" class="tab-content container" style="display:none">
+      <section class="hero">
+        <h2 class="hero-title">📡 Live News Feed</h2>
+        <p class="hero-sub">Today's headlines from BBC, Reuters, The Guardian, NPR &amp; Al Jazeera — verified by AI.
+        </p>
+      </section>
+
+      <div class="live-feed-toolbar">
+        <button class="btn btn-primary" id="refresh-feed-btn" onclick="App.loadLiveFeed()">
+          <span class="btn-text">🔄 Refresh Feed</span>
+          <span class="btn-spinner" hidden></span>
+        </button>
+        <p class="live-feed-note">⚡ All fetched articles are saved to your history automatically.</p>
+      </div>
+
+      <div id="live-feed-loading" class="loading-state" hidden>
+        <div class="spinner-lg"></div>
+        <p>Fetching and analyzing live headlines…<br><small>This may take 20–40 seconds on first load.</small></p>
+      </div>
+      <div id="live-feed-error" class="form-error" role="alert" hidden></div>
+      <div id="live-feed-stats" class="feed-stats" hidden></div>
+      <div id="live-feed-list" class="live-feed-grid"></div>
+    </main>
+
+    <!-- ─── HISTORY TAB ──────────────────────────────────────── -->
+    <main id="tab-history" class="tab-content container" style="display:none">
+      <section class="hero">
+        <h2 class="hero-title">Your Analysis History</h2>
+        <p class="hero-sub">All past verifications — text, URL, and live feed — saved to your account.</p>
+      </section>
+      <div id="history-area">
+        <div class="loading-state" id="history-loading" hidden>
+          <div class="spinner-lg"></div>
+          <p>Loading history…</p>
+        </div>
+        <div id="history-empty" class="empty-state" hidden>
+          <p class="empty-icon">📭</p>
+          <p>No predictions yet. Analyze an article first!</p>
+        </div>
+        <div id="history-list"></div>
+        <div class="pagination" id="pagination" hidden>
+          <button class="btn btn-ghost btn-sm" id="prev-page" onclick="App.changePage(-1)">← Previous</button>
+          <span id="page-indicator" class="page-info"></span>
+          <button class="btn btn-ghost btn-sm" id="next-page" onclick="App.changePage(1)">Next →</button>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

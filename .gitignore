@@ -1,0 +1,48 @@
+# ══════════════════════════════════════════════
+#  Fake News Detector  —  .gitignore
+# ══════════════════════════════════════════════
+
+# ── Secrets ───────────────────────────────────
+.env
+
+# ── Java / Maven ──────────────────────────────
+backend/target/
+*.class
+*.jar
+*.war
+*.ear
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# ── Python ────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+ml_service/venv/
+.venv/
+*.egg-info/
+
+# ── ML Artifacts & Data ──────────────────────
+ml_service/artifacts/*.joblib
+ml_service/artifacts/*.pkl
+ml_service/data/*.csv
+
+# ── IDE / Editor ──────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── OS Files ──────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Build / Log Files ────────────────────────
+*.log
+build_errors.txt
+build_result.txt
+startup_error.txt
+startup_result.txt
+startup_result2.txt
