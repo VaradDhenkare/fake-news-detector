@@ -6,6 +6,7 @@ import java.util.Optional;
 
 /**
  * Spring Data repository for User persistence.
+ * DAO
  */
 public interface UserRepository extends JpaRepository<User, Long> {
 
