@@ -17,6 +17,7 @@ backend/.mvn/wrapper/maven-wrapper.jar
 __pycache__/
 *.py[cod]
 *.pyo
+venv/
 ml_service/venv/
 .venv/
 *.egg-info/
@@ -38,6 +39,10 @@ ml_service/data/*.csv
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# -- Local Scripts --
+start-backend.ps1
+start-backend.bat
 
 # ── Build / Log Files ────────────────────────
 *.log
